@@ -1,0 +1,2 @@
+a = "Hellow~!"
+print(a)

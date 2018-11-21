@@ -1,0 +1,253 @@
+---
+title: "Reading, writing and editing data in R"
+author: "Park Beom Jin"
+date: "2018년 11월 21일"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Reading, writing and editing data in R
+
+* 데이터 파일 불러오기
+* 데이터 파일 저장하기
+* 데이터 처리하기
+
+## Reading data
+
+* txt, csv, excel 등으로 저장된 외부 데이터 파일을 불러들이는 방법
+
+### txt 파일 읽기
+
+* .txt 파일은 기본적으로 read.table() 함수를 사용하여 데이터를 불러옴
+
+* read.table() 함수의 주요 인자들
+    + file : 파일명
+    + header : 파일의 첫 행을 변수명으로 처리할 것인지 여부
+    + sep : 데이터 값의 구분자, 예를 들어 "," 입력시 ","로 값을 구분함
+    + na.strings : 데이터에 결측치가 포함되어 있을 경우 NA에 대응시킬 값을 지정
+    + skip : 데이터를 읽을 때, 건너뛸 행의 개수
+    + stringsAsFactors : 문자열을 팩터형으로 처리할 것인지 여부
+
+
+---
+
+```{r txt, echo = TRUE}
+iris = read.table("~/GitHub/Programming-Language/data/iris.txt", 
+                  header = FALSE, sep = ",", stringsAsFactors = FALSE)
+head(iris)
+str(iris)
+```
+
+---
+
+### csv 파일 읽기
+
+* .csv 파일은 read.csv() 함수를 사용하여 데이터를 불러옴
+* read.csv() 함수의 인자들은 read.table() 함수와 거의 같음
+
+* read.csv() 함수의 주요 인자들
+    + file : 파일명
+    + header : 파일의 첫 행을 변수명으로 처리할 것인지 여부
+    + sep : 데이터 값의 구분자, 예를 들어 "," 입력시 ","로 값을 구분함
+    + na.strings : 데이터에 결측치가 포함되어 있을 경우 NA에 대응시킬 값을 지정
+    + skip : 데이터를 읽을 때, 건너뛸 행의 개수
+    + stringsAsFactors : 문자열을 팩터형으로 처리할 것인지 여부 
+
+---
+
+```{r csv, echo = TRUE}
+car = read.csv("~/GitHub/Programming-Language/data/car.csv", 
+                  header = TRUE, sep = ",", stringsAsFactors = FALSE)
+head(car)
+str(car)
+```
+
+---
+
+### Excel 파일 읽기
+
+* .xls, .xlsx 파일의 데이터를 불러오는 내장함수가 존재하지 않기 때문에 패키지를 설치해아함
+* readxl 패키지의 read_excel() 함수를 이용하여 .xls나 .xlsx 파일을 불러올 수 있음
+
+* read_excel() 함수의 주요 인자들
+    + path : 파일명 (파일의 path)
+    + sheet : 데이터를 불러올 sheet 이름 또는 위치
+    + range : 데이터의 cell 범위 (예 : "B3:D97")
+    + col_names : 파일의 첫 행을 변수명으로 처리할 것인지 여부
+    + na : 데이터에 결측치가 포함되어 있을 경우 NA에 대응시킬 값을 지정
+    + skip : 데이터를 읽을 때, 건너뛸 행의 개수
+
+---
+
+```{r excel, echo = TRUE}
+library(readxl)
+car_excel = read_excel("~/GitHub/Programming-Language/data/car_excel.xlsx",
+                       sheet = 1, col_names = TRUE)
+head(car_excel)
+str(car_excel)
+```
+
+---
+
+## Writing data
+
+* R에서 데이터를 다양한 알고리즘으로 처리한 뒤, 메모리상에 저장되어 있는 객체를  .txt, .csv 또는 .xlsx 등의 파일로 저장하는 방법
+
+### txt 또는 csv 파일로 내보내기 
+
+* 메모리상에 저장되어 있는 객체를 .txt 파일 또는 .csv 파일로 내보내기 위해서는 write.table(), .write.csv() 함수를 이용함
+* write.table()(write.csv()) 함수의 주요 인자들
+    * x : 파일로 내보낼 객체 (예: 행렬, 데이터프레임 등)
+    * file : 내보낼 파일의 이름
+    * row.names : 내보낼 파일에 행 이름을 포함할지 여부
+    * col.names : 내보낼 파일에 열 이름을 포함할지 여부 또는 문자 벡터를 입력시 열 이름을 입력해 줄 수 있음
+    * fileEncoding : 내보낼 파일의 인코딩
+    
+---
+
+```{r text_w, echo = TRUE}
+write.table(x = iris, file = "~/GitHub/Programming-Language/data/iris2.txt", 
+            row.names = FALSE, col.names = FALSE)
+
+# write.csv는 col.names은 작동 안함 (?write.csv 참조)
+write.csv(x = car, file = "~/GitHub/Programming-Language/data/car2.csv",
+          row.names = FALSE, col.names = FALSE)
+```
+
+---
+
+## load 와 save
+
+* R에는 다양한 형태의 객체들이 존재함.
+* 하지만 read.\* 함수와 write.\*  함수는 숫자, 문자 등으로 구성되어 있고 테이블 형태로 읽고 내보냄
+* 조금 더 유연(flexible)한 형태의 객체 저장 포맷으로 .RData가 있음
+* save() 함수는 R 객체를 .RData로 저장
+    * ... : 저장할 객체의 이름
+    * list = character() : 저장할 객체의 이름을 벡터로 지정할 경우 ... 대신 사용
+    * file : 내보낼 파일의 이름
+    
+* load() 함수는 .RData를 불러옴
+    * file : 불러올 파일의 이름
+
+---
+
+```{r save, echo = TRUE}
+rm(iris)
+lm_fit = lm(Petal.Length ~ Petal.Width, data = iris)
+summary(lm_fit)
+```
+
+---
+
+```{r save2, echo = TRUE}
+str(lm_fit)
+```
+
+---
+
+```{r save3, echo = TRUE}
+save(iris, lm_fit, file = "~/GitHub/Programming-Language/data/lm_fit.RData")
+save(list = c("iris", "lm_fit"), file = "~/GitHub/Programming-Language/data/lm_fit2.RData")
+save.image(file = "~/GitHub/Programming-Language/data/lm_fit3.RData")
+load("~/GitHub/Programming-Language/data/lm_fit.RData")
+```
+
+---
+
+## source 함수
+
+* source 함수는 파일(.txt, .R 등)에서 R 코드를 읽는 함수
+* source 함수를 이용하면 해당 파일에 적혀있는 코드를 현재 R 환경에서 실행함
+* 미리 짜놓은 함수 또는 반복적으로 실행 또는 불러와야하는 코드가 있는 경우 유용함
+
+```{r source, echo = TRUE}
+source("~/GitHub/Programming-Language/data/hellow.R")
+source("~/GitHub/Programming-Language/data/bye.txt")
+```
+
+---
+
+## Editing data
+
+* split() : 주어진 조건에 따라 데이터를 분리
+* subset() : 주어진 조건을 만족하는 데이터를 선택
+* merge() : 데이터를 공통된 값에 기준해 병합
+
+### split
+
+* 데이터를 주어진 조건에 따라 분리하고자 할 때, split() 함수를 이용함
+* split() 함수의 주요 인자들
+    + x : 분리할 벡터 또는 데이터 프레임
+    + f : 분리할 기준을 저장한 팩터
+    + drop : 인자 f에 포함되지 않은 레벨을 제외할지 여부
+    
+---
+```{r split_tmp, echo = FALSE}
+tmp_iris = do.call(rbind.data.frame, lapply(split(iris, iris$Species), FUN = function(x) head(x, 3)))
+```
+
+```{r split, echo = TRUE}
+split(tmp_iris, tmp_iris$Species)
+```
+
+---
+
+* split()의 실행 결과가 리스트이므로, split() 후 lapply()를 적용하면 iris의 종별 열 평균을 구할 수 있음
+
+```{r split_colmean, echo = TRUE}
+lapply(split(iris, iris$Species), FUN = function(x) colMeans(x[, -5]))
+```
+
+---
+
+### subset
+
+* subset() 함수는 조건을 만족하는 특정 부분만 뽑아내는 용도
+* subset() 함수의 주요 인자들
+    + x : 일부를 뽑아낼 객체
+    + subset : 논리 표현으로 TRUE인 행을 선택함
+    + select : 데이터 프레임의 경우 선택하고자 하는 열 
+    
+```{r subset, echo = TRUE}
+subset(iris, subset = Sepal.Length < 5, 
+       select = c(Sepal.Length, Sepal.Width, Species))
+```
+  
+---
+
+### merge
+
+* merge() 함수는 두 데이터 프레임을 공통된 값을 기준으로 묶는 함수
+* merge() 함수의 주요 인자들
+    + x, y : 병합할 데이터 프레임
+    + by, by.x, by.y : 병합에 기준으로 사용할 열, x와 y에 병합에 사용할 열이 다르다면 by.x 와 by.y를 지정
+    + all, all.x, all.y : all = TRUE이면 x와 y 중 어느 한쪽에 공통된 값을 가지는 행이 없을 때, NA로 채워 병합, all.x = TRUE이면 x 값이 y에 없으면 NA로 채워 병합  
+  
+---
+
+```{r merge_data, echo = TRUE}
+x = data.frame(name = c("a", "b", "c"), math = c(1, 2, 3))
+y = data.frame(name = c("c", "a"), eng = c(4, 5))
+```
+
+```{r merge1, echo = TRUE}
+merge(x, y, by = "name")
+```
+
+```{r merge2, echo = TRUE}
+merge(x, y, by = "name", all = TRUE)
+```
+
+---
+
+```{r merge3, echo = TRUE}
+merge(x, y, by = "name", all.x = TRUE)
+```
+
+
+```{r merge4, echo = TRUE}
+merge(x, y, by = "name", all.y = TRUE)
+```
