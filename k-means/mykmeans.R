@@ -22,7 +22,13 @@ euclid_mat = function(x, y)
   return(sqrt(colSums((x - y)^2)))
 }
 
+manhattan = function(x, y) 
+{
+  return(colSums(abs(x - y)))
+}
 
+dist_fun = euclid_mat
+dist_fun = manhattan
 
 #### Clustering function ####
 mykmeans = function(data, centers, iter.max = 50){
@@ -70,7 +76,7 @@ mykmeans = function(data, centers, iter.max = 50){
     #     dist[,i] = apply(data_mat, 1, function(x) euclid(x, center_mat[i, , drop = FALSE])) 
     # } 
     for (i in 1:centers) {
-      dist[, i] = euclid_mat(t(data_mat), drop(center_mat[i, , drop = FALSE]))
+      dist[, i] = dist_fun(t(data_mat), drop(center_mat[i, , drop = FALSE]))
     }
     
     cluster <- apply(dist, 1, which.min) # make cluster
