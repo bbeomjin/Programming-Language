@@ -38,7 +38,7 @@ mykmeans = function(data, centers, iter.max = 50){
   # iter.max : maximum number of iterations
   # par(mfrow = c(2,4))
   
-  colClass = apply(data, 2, function(x) class(x))
+  colClass = sapply(data, 2, function(x) class(x))
   colClass_ind = colClass %in% c("numeric")
   
   if (any(colClass %in% "character")) {
@@ -66,11 +66,9 @@ mykmeans = function(data, centers, iter.max = 50){
   dist = matrix(nrow = n, ncol = centers)
   
   iter = 0
-  cond = TRUE
   center_mat_old = center_mat
   
-  while (((iter = iter + 1) < iter.max) | (cond)) {
-    iter = iter + 1
+  while ((iter = iter + 1) < iter.max) {
     # calcuate distance to each center
     # for (i in 1:centers){
     #     dist[,i] = apply(data_mat, 1, function(x) euclid(x, center_mat[i, , drop = FALSE])) 
@@ -79,7 +77,7 @@ mykmeans = function(data, centers, iter.max = 50){
       dist[, i] = dist_fun(t(data_mat), drop(center_mat[i, , drop = FALSE]))
     }
     
-    cluster <- apply(dist, 1, which.min) # make cluster
+    cluster = apply(dist, 1, which.min) # make cluster
     
     # update cluster mean
     for(i in 1:centers){
@@ -90,7 +88,6 @@ mykmeans = function(data, centers, iter.max = 50){
       break
     } else {
       center_mat_old = center_mat
-      cond = FALSE
     }
     # plot(data_mat[,1:2], col = cluster)
     # points( x = center_mat[,1], y = center_mat[,2], pch="+", col = "blue", cex = 2)
