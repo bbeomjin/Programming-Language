@@ -96,19 +96,28 @@ word_to_num1000 = function(word)
   }
   
   tmp = numeric(length(wsplit))
+  cc = 0
   for (i in 1:length(wsplit)) {
     if (wsplit[i] %in% names(doubles)) {
       tmp[i] = as.numeric(doubles[wsplit[i]])
     } else if (wsplit[i] == "hundred") {
       tmp[i - 1] = tmp[i - 1] * 100
+      cc = cc + 1
     } else if (wsplit[i] == "thousand") {
       tmp[i - 1] = tmp[i - 1] * 1000
+      cc = cc + 1
     }
   }
   out = sum(tmp)
+  
+  if (sum(tmp %in% unlist(teens)) > 1 | sum(tmp %in% unlist(ten_digits)) > 1) {stop(paste("Error:", word))}
+  if (sum(tmp %in% unlist(one_digits)) > (cc + 1)) {stop(paste("Error:", word))}
+  if ((length(wsplit) > 1) & (out == 0)) {stop(paste("Error:", word))}
   return(list(word, out))
 }
 
 word_to_num1000("thirty one")
-word_to_num1000("one hundred thirty one")
-word_to_num1000("three thousand one hundred thirty one")
+word_to_num1000(word = "one hundred thirty one")
+word_to_num1000(word = "three thousand one hundred thirty one")
+word_to_num1000(word = "twelve twelve twelve")
+word_to_num1000(word = "thirteen twelve")
