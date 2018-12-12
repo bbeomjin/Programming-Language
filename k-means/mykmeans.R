@@ -28,7 +28,7 @@ manhattan = function(x, y)
 }
 
 dist_fun = euclid_mat
-dist_fun = manhattan
+# dist_fun = manhattan
 
 #### Clustering function ####
 mykmeans = function(data, centers, iter.max = 50){
@@ -83,6 +83,14 @@ mykmeans = function(data, centers, iter.max = 50){
     for(i in 1:centers){
       center_mat[i, ] = colMeans(data_mat[cluster == i, , drop = FALSE])
     } 
+    
+    if (sum(is.nan(center_mat)) > 0) {
+      cluster = sample(1:centers, n, replace = TRUE)
+      
+      for (i in 1:centers) {
+        center_mat[i, ] = colMeans(data_mat[cluster == i, , drop = FALSE])
+      }
+    }
     
     if (sqrt(sum((center_mat_old - center_mat)^2)) < 1e-10) {
       break
