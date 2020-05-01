@@ -38,7 +38,7 @@ mykmeans = function(data, centers, iter.max = 50){
   # iter.max : maximum number of iterations
   # par(mfrow = c(2,4))
   
-  colClass = sapply(data, 2, function(x) class(x))
+  colClass = apply(data, 2, function(x) class(x))
   colClass_ind = colClass %in% c("numeric")
   
   if (any(colClass %in% "character")) {
